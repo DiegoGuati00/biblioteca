@@ -25,7 +25,7 @@ class BookViewSet(viewsets.ModelViewSet):
         else:
             return BookSerializer
         
-    def get_permissions(self):
+    def get_permissions_class(self):
         if self.action == ["create","update","delete"]:
             permission_classes = [IsAdminUser] 
         else:
