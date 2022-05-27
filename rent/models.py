@@ -15,9 +15,9 @@ class Rent(models.Model):
         ("r", "RECLAMADO"),
         ("d", "DEVUELTO")
     ]
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    status = models.CharField(choices=STATES_RENT, max_length=1)
+    status = models.CharField(choices=STATES_RENT, max_length=1,null=True)
 
 class Rented(models.Model):
     rent = models.ForeignKey(Rent,on_delete=models.CASCADE)
@@ -43,7 +43,7 @@ def update_status_rack(sender, instance, created, **kwargs):
     #after update the book at false it will update state set asided
     #and book will update state at False
     elif instance.state == False:
-        rent = Rent.objects.get(instance.rent.id)
+        rent = Rent.objects.get(pk=instance.rent.id)
         if rent.status == "r":
             rent.status = "d"
             rent.save()

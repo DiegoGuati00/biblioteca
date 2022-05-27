@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from books.models import Book, BookItem
 from books.serializer import BookItemSerializer
 from rent.models import Rent, Rented
-from rent.serializer import RentSerializer,ReadRentSerializer, RentedSerializer, UpdateRentSerializer
+from rent.serializer import CreateRentSerializer, RentSerializer,ReadRentSerializer, RentedSerializer, UpdateRentSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
@@ -14,15 +14,15 @@ from rest_framework.decorators import action
 # Create your views here.
 class RentViewSet(viewsets.ModelViewSet):
     queryset = Rent.objects.all()
-    serializer_class = RentSerializer
+    serializer_class = RentSerializer()
     
     def get_serializer_class(self, *args, **kwargs):
         if self.action == "create":
-            return RentSerializer
+            return CreateRentSerializer
         # elif self.action == "update":
         #     return UpdateRentSerializer
         else:
-            return ReadRentSerializer
+            return RentSerializer
         
     # def get_permissions(self):
     #     if self.action == "books_rented"or"create":
@@ -36,14 +36,14 @@ class RentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         #get the book that user want
             bookExist = BookItem.objects.filter(
-                book = request.data["Book"],
+                book = request.data["book"],
                 status = False
             ).values_list("id",flat=True)
             #validate if exist a copy and create request this user
             if len(bookExist):
                 thisBookExist = Rent.objects.create(
                     owner = self.request.user,
-                    book = get_object_or_404(Book,pk=request.data["Book"]),
+                    book = get_object_or_404(Book,pk=request.data["book"]),
                     status = "a"
                 )
                 reclaim = Rented.objects.create(
